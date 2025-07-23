@@ -133,9 +133,30 @@ def main():
         )
         return
 
-    # --- Snowflake Queries ---
-    grounding_query = f"select t.text from twitter_tweets t join twitter_profiles p on t.poster_id = p.id where p.name = 'SquadsProtocol' or p.name = 'Carlos_0x' or p.name = 'SimkinStepan' ORDER by t.timestamp DESC LIMIT 100"
-    recency_query = f"select t.text from twitter_tweets t join twitter_profiles p on t.poster_id = p.id where p.name = 'sytaylor' or p.name = 'chuk_xyz' ORDER by t.timestamp DESC LIMIT 500"
+    # --- Author Lists (Easy to Update) ---
+    grounding_authors = ['SquadsProtocol', 'Carlos_0x', 'SimkinStepan']
+    recency_authors = ['sytaylor', 'chuk_xyz']
+    # -----------------------------------------
+
+    # --- Snowflake Query Generation ---
+    def create_author_filter(authors):
+        """Creates a SQL 'OR' chain from a list of author names."""
+        return " OR ".join([f"p.name = '{author}'" for author in authors])
+
+    base_query_template = (
+        f"select t.text from {snowflake_database}.{snowflake_schema}.twitter_tweets t "
+        f"join {snowflake_database}.{snowflake_schema}.twitter_profiles p on t.poster_id = p.id "
+        "where {author_filter} ORDER by t.timestamp DESC LIMIT {limit}"
+    )
+
+    grounding_query = base_query_template.format(
+        author_filter=create_author_filter(grounding_authors),
+        limit=100
+    )
+    recency_query = base_query_template.format(
+        author_filter=create_author_filter(recency_authors),
+        limit=500
+    )
     # ----------------------------------------------------
 
     print("Fetching grounding tweets...")
