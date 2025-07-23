@@ -1,4 +1,4 @@
-# Text Generation Example based on grounding and recency tweets
+# Text Generation Example Based on Grounding and Recency Tweets
 
 This script generates high-quality tweets in the style of a given set of "grounding" authors, based on themes from a set of "recency" tweets. It fetches the source tweets from a Snowflake database, uses the OpenAI API for generation, and outputs the results to a CSV file.
 
